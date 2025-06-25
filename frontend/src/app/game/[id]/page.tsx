@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Game } from "@/types/game";
-import { gameApi } from "@/lib/api";
+import { useGame, useUpdateGameRound, useEndGame } from "@/hooks/useGames";
 import {
   createEmptyBoard,
   makeMove,
@@ -20,7 +19,12 @@ export default function GamePage() {
   const router = useRouter();
   const gameId = params.id as string;
 
-  const [game, setGame] = useState<Game | null>(null);
+  // React Query hooks
+  const { data: game, isLoading, error, refetch } = useGame(gameId);
+  const updateGameRoundMutation = useUpdateGameRound();
+  const endGameMutation = useEndGame();
+
+  // Local game state
   const [board, setBoard] = useState<(string | null)[]>(createEmptyBoard());
   const [currentPlayer, setCurrentPlayer] = useState<"X" | "O">("X");
   const [gameOverState, setGameOverState] = useState<{
@@ -32,29 +36,6 @@ export default function GamePage() {
     winner: null,
     winningCells: [],
   });
-  const [loading, setLoading] = useState(true);
-  const [updatingGame, setUpdatingGame] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (gameId) {
-      loadGame();
-    }
-  }, [gameId]);
-
-  const loadGame = async () => {
-    try {
-      setLoading(true);
-      const gameData = await gameApi.getGame(gameId);
-      setGame(gameData);
-      setError(null);
-    } catch (err) {
-      setError("Failed to load game. Please try again.");
-      console.error("Error loading game:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleCellClick = async (index: number) => {
     if (gameOverState.isOver || !game) return;
@@ -90,31 +71,16 @@ export default function GamePage() {
           winningCells,
         });
 
-        // Update game in backend
-        await updateGameResult(newBoard);
+        // Update game in backend using React Query mutation
+        const result = getGameResult(newBoard);
+        if (result) {
+          updateGameRoundMutation.mutate({ gameId, winner: result });
+        }
       } else {
         setCurrentPlayer(getNextPlayer(currentPlayer));
       }
     } catch (err) {
       console.error("Error making move:", err);
-    }
-  };
-
-  const updateGameResult = async (finalBoard: (string | null)[]) => {
-    if (!game) return;
-
-    try {
-      setUpdatingGame(true);
-      const result = getGameResult(finalBoard);
-
-      if (result) {
-        const updatedGame = await gameApi.updateGameRound(gameId, result);
-        setGame(updatedGame);
-      }
-    } catch (err) {
-      console.error("Error updating game result:", err);
-    } finally {
-      setUpdatingGame(false);
     }
   };
 
@@ -128,19 +94,12 @@ export default function GamePage() {
     });
   };
 
-  const handleEndGame = async () => {
-    if (!game) return;
-
-    try {
-      setUpdatingGame(true);
-      await gameApi.endGame(gameId);
-      router.push("/");
-    } catch (err) {
-      console.error("Error ending game:", err);
-      setError("Failed to end game. Please try again.");
-    } finally {
-      setUpdatingGame(false);
-    }
+  const handleEndGame = () => {
+    endGameMutation.mutate(gameId, {
+      onSuccess: () => {
+        router.push("/");
+      },
+    });
   };
 
   const getWinnerName = () => {
@@ -159,7 +118,8 @@ export default function GamePage() {
     return currentPlayer === "X" ? game.player1.name : game.player2.name;
   };
 
-  if (loading) {
+  // Loading state
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
@@ -170,6 +130,7 @@ export default function GamePage() {
     );
   }
 
+  // Error state
   if (error || !game) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -179,18 +140,32 @@ export default function GamePage() {
             Game Not Found
           </h2>
           <p className="text-gray-600 mb-4">
-            {error || "The game you're looking for doesn't exist."}
+            {error instanceof Error
+              ? error.message
+              : "The game you're looking for doesn't exist."}
           </p>
-          <button
-            onClick={() => router.push("/")}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition-colors"
-          >
-            Go Home
-          </button>
+          <div className="space-x-4">
+            <button
+              onClick={() => refetch()}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => router.push("/")}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition-colors"
+            >
+              Go Home
+            </button>
+          </div>
         </div>
       </div>
     );
   }
+
+  // Check if mutations are in progress
+  const isMutating =
+    updateGameRoundMutation.isPending || endGameMutation.isPending;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
@@ -265,7 +240,7 @@ export default function GamePage() {
           <TicTacToeBoard
             board={board}
             onCellClick={handleCellClick}
-            disabled={gameOverState.isOver}
+            disabled={gameOverState.isOver || isMutating}
             winningCells={gameOverState.winningCells}
           />
         </div>
@@ -275,17 +250,17 @@ export default function GamePage() {
           <div className="flex gap-4 justify-center">
             <button
               onClick={handleNewRound}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
-              disabled={updatingGame}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+              disabled={isMutating}
             >
               🎮 Continue (New Round)
             </button>
             <button
               onClick={handleEndGame}
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
-              disabled={updatingGame}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+              disabled={isMutating}
             >
-              {updatingGame ? (
+              {endGameMutation.isPending ? (
                 <>
                   <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                   Ending Game...
@@ -294,6 +269,23 @@ export default function GamePage() {
                 <>🏁 Stop & Save Game</>
               )}
             </button>
+          </div>
+        )}
+
+        {/* Mutation Error Messages */}
+        {updateGameRoundMutation.error && (
+          <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-3 max-w-md mx-auto">
+            <p className="text-red-700 text-sm">
+              Failed to update game: {updateGameRoundMutation.error.message}
+            </p>
+          </div>
+        )}
+
+        {endGameMutation.error && (
+          <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-3 max-w-md mx-auto">
+            <p className="text-red-700 text-sm">
+              Failed to end game: {endGameMutation.error.message}
+            </p>
           </div>
         )}
 

@@ -1,35 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Game } from "@/types/game";
-import { gameApi } from "@/lib/api";
+import { useGames } from "@/hooks/useGames";
 
 export default function Home() {
-  const [games, setGames] = useState<Game[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    loadGames();
-  }, []);
-
-  const loadGames = async () => {
-    try {
-      setLoading(true);
-      const fetchedGames = await gameApi.getAllGames();
-      setGames(fetchedGames);
-      setError(null);
-    } catch (err) {
-      setError(
-        "Failed to load games. Please make sure the backend server is running."
-      );
-      console.error("Error loading games:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: games = [], isLoading, error, refetch } = useGames();
 
   const handleStartNewGame = () => {
     router.push("/new-game");
@@ -45,10 +21,7 @@ export default function Home() {
     });
   };
 
-  const getGameSummary = (game: Game) => {
-    const total1 = game.player1.wins + game.player1.losses + game.player1.draws;
-    const total2 = game.player2.wins + game.player2.losses + game.player2.draws;
-
+  const getGameSummary = (game: any) => {
     if (game.player1.wins > game.player2.wins) {
       return `${game.player1.name} Won`;
     } else if (game.player2.wins > game.player1.wins) {
@@ -56,6 +29,10 @@ export default function Home() {
     } else {
       return "Tied Series";
     }
+  };
+
+  const handleRetry = () => {
+    refetch();
   };
 
   return (
@@ -81,27 +58,34 @@ export default function Home() {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
             📊 Game History
-            {!loading && (
+            {!isLoading && (
               <span className="ml-2 text-sm font-normal text-gray-500">
                 ({games.length} games)
               </span>
             )}
           </h2>
 
-          {loading && (
+          {/* Loading State */}
+          {isLoading && (
             <div className="text-center py-8">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
               <p className="mt-2 text-gray-600">Loading games...</p>
             </div>
           )}
 
+          {/* Error State */}
           {error && (
             <div className="text-center py-8">
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <p className="text-red-700">{error}</p>
+                <p className="text-red-700 font-medium mb-2">
+                  Failed to load games
+                </p>
+                <p className="text-red-600 text-sm">
+                  {error instanceof Error ? error.message : "An error occurred"}
+                </p>
               </div>
               <button
-                onClick={loadGames}
+                onClick={handleRetry}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
               >
                 Try Again
@@ -109,7 +93,8 @@ export default function Home() {
             </div>
           )}
 
-          {!loading && !error && games.length === 0 && (
+          {/* Empty State */}
+          {!isLoading && !error && games.length === 0 && (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🎯</div>
               <h3 className="text-xl font-semibold text-gray-700 mb-2">
@@ -127,7 +112,8 @@ export default function Home() {
             </div>
           )}
 
-          {!loading && !error && games.length > 0 && (
+          {/* Games Table */}
+          {!isLoading && !error && games.length > 0 && (
             <div className="overflow-x-auto">
               <table className="w-full table-auto">
                 <thead>
@@ -153,7 +139,7 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {games.map((game, index) => (
+                  {games.map((game) => (
                     <tr
                       key={game._id}
                       className="border-b hover:bg-gray-50 transition-colors"

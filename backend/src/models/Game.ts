@@ -11,9 +11,9 @@ export interface IGame extends Document {
   player1: IPlayer;
   player2: IPlayer;
   totalRounds: number;
+  isActive: boolean;
   createdAt: Date;
   endedAt?: Date;
-  isActive: boolean;
 }
 
 const PlayerSchema = new Schema<IPlayer>({
@@ -27,9 +27,9 @@ const GameSchema = new Schema<IGame>({
   player1: { type: PlayerSchema, required: true },
   player2: { type: PlayerSchema, required: true },
   totalRounds: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
-  endedAt: { type: Date },
-  isActive: { type: Boolean, default: true }
+  endedAt: { type: Date }
 });
 
 export const Game = mongoose.model<IGame>('Game', GameSchema); 
