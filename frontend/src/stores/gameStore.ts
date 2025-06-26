@@ -33,7 +33,7 @@ const initialBoard = Array(9).fill(null)
 export const useGameStore = create<GameState>()(
   devtools(
     persist(
-      (set, get) => ({
+      (set, _) => ({
         // Initial state
         board: initialBoard,
         currentPlayer: 'X',

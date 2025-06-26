@@ -28,7 +28,7 @@ export default function GameStatus({
             <div>
               <div className="text-2xl mb-2">🤝</div>
               <div className="text-xl font-bold text-gray-600">
-                It's a Draw!
+                It&apos;s a Draw!
               </div>
             </div>
           )}
@@ -36,7 +36,8 @@ export default function GameStatus({
       ) : (
         <div className="bg-white rounded-lg p-4 shadow-md inline-block">
           <div className="text-lg">
-            <span className="font-semibold">{currentPlayerName}'s</span> turn
+            <span className="font-semibold">{currentPlayerName}&apos;s</span>{' '}
+            turn
             <span className="ml-2 text-2xl">
               {currentPlayer === 'X' ? '❌' : '⭕'}
             </span>

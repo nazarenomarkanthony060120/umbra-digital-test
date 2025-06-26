@@ -35,8 +35,6 @@ export default function GameBoardWithZustand({ gameId }: GameBoardProps) {
     isGameOver: gameOver,
     winner,
     winningCells,
-    player1Name,
-    player2Name,
     setBoard,
     setCurrentPlayer,
     setGameOver,
