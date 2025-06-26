@@ -11,7 +11,7 @@ export const gameController = {
       res.status(200).json({
         success: true,
         data: games,
-        count: games.length
+        count: games.length,
       });
     } catch (error) {
       next(error);
@@ -28,7 +28,7 @@ export const gameController = {
       res.status(201).json({
         success: true,
         data: newGame,
-        message: 'Game created successfully'
+        message: 'Game created successfully',
       });
     } catch (error) {
       next(error);
@@ -43,7 +43,7 @@ export const gameController = {
 
       res.status(200).json({
         success: true,
-        data: game
+        data: game,
       });
     } catch (error) {
       next(error);
@@ -61,7 +61,7 @@ export const gameController = {
       res.status(200).json({
         success: true,
         data: updatedGame,
-        message: 'Game round updated successfully'
+        message: 'Game round updated successfully',
       });
     } catch (error) {
       next(error);
@@ -77,10 +77,10 @@ export const gameController = {
       res.status(200).json({
         success: true,
         data: updatedGame,
-        message: 'Game ended successfully'
+        message: 'Game ended successfully',
       });
     } catch (error) {
       next(error);
     }
-  }
-}; 
+  },
+};

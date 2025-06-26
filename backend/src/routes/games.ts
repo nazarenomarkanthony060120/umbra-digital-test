@@ -19,4 +19,4 @@ router.put('/:id/round', validateGameId, validateUpdateRound, gameController.upd
 // PUT /api/games/:id/end - End a game session
 router.put('/:id/end', validateGameId, gameController.endGame);
 
-export default router; 
+export default router;

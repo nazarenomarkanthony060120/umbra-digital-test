@@ -14,4 +14,4 @@ export class ApiError extends Error {
       Error.captureStackTrace(this, ApiError);
     }
   }
-} 
+}

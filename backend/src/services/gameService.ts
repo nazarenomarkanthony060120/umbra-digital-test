@@ -38,16 +38,16 @@ export const gameService = {
           name: player1Name.trim(),
           wins: 0,
           losses: 0,
-          draws: 0
+          draws: 0,
         },
         player2: {
           name: player2Name.trim(),
           wins: 0,
           losses: 0,
-          draws: 0
+          draws: 0,
         },
         totalRounds: 0,
-        isActive: true
+        isActive: true,
       });
 
       const savedGame = await newGame.save();
@@ -85,7 +85,10 @@ export const gameService = {
   /**
    * Update game round result
    */
-  updateGameRound: async (gameId: string, winner: 'player1' | 'player2' | 'draw'): Promise<IGame> => {
+  updateGameRound: async (
+    gameId: string,
+    winner: 'player1' | 'player2' | 'draw'
+  ): Promise<IGame> => {
     // Validate input
     if (!isValidObjectId(gameId)) {
       throw new ApiError('Invalid game ID format', 400);
@@ -161,5 +164,5 @@ export const gameService = {
       }
       throw new ApiError('Failed to end game', 500);
     }
-  }
-}; 
+  },
+};

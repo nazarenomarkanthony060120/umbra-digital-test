@@ -1,8 +1,8 @@
 interface TicTacToeBoardProps {
-  board: (string | null)[];
-  onCellClick: (index: number) => void;
-  disabled?: boolean;
-  winningCells?: number[];
+  board: (string | null)[]
+  onCellClick: (index: number) => void
+  disabled?: boolean
+  winningCells?: number[]
 }
 
 export default function TicTacToeBoard({
@@ -18,31 +18,31 @@ export default function TicTacToeBoard({
       transition-all duration-200 cursor-pointer
       hover:bg-gray-50 hover:scale-105
       active:scale-95
-    `.trim();
+    `.trim()
 
     const disabledClasses =
-      disabled || board[index] !== null ? "cursor-not-allowed opacity-60" : "";
+      disabled || board[index] !== null ? 'cursor-not-allowed opacity-60' : ''
     const winningClasses = winningCells.includes(index)
-      ? "bg-green-100 border-green-400"
-      : "";
+      ? 'bg-green-100 border-green-400'
+      : ''
 
-    return `${baseClasses} ${disabledClasses} ${winningClasses}`;
-  };
+    return `${baseClasses} ${disabledClasses} ${winningClasses}`
+  }
 
   const getCellContent = (index: number) => {
-    const value = board[index];
-    if (value === "X") {
-      return <span className="text-blue-600">❌</span>;
-    } else if (value === "O") {
-      return <span className="text-red-600">⭕</span>;
+    const value = board[index]
+    if (value === 'X') {
+      return <span className="text-blue-600">❌</span>
+    } else if (value === 'O') {
+      return <span className="text-red-600">⭕</span>
     }
-    return null;
-  };
+    return null
+  }
 
   const handleCellClick = (index: number) => {
-    if (disabled || board[index] !== null) return;
-    onCellClick(index);
-  };
+    if (disabled || board[index] !== null) return
+    onCellClick(index)
+  }
 
   return (
     <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto p-4 bg-white rounded-xl shadow-lg">
@@ -52,11 +52,11 @@ export default function TicTacToeBoard({
           className={getCellClassName(index)}
           onClick={() => handleCellClick(index)}
           disabled={disabled || board[index] !== null}
-          aria-label={`Cell ${index + 1}, ${board[index] || "empty"}`}
+          aria-label={`Cell ${index + 1}, ${board[index] || 'empty'}`}
         >
           {getCellContent(index)}
         </button>
       ))}
     </div>
-  );
+  )
 }

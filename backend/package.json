@@ -8,6 +8,7 @@
     "dev:watch": "npx nodemon --exec \"npx ts-node src/server.ts\"",
     "build": "tsc",
     "start": "node dist/server.js",
+    "format:src": "prettier --write src/**/*.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -15,7 +16,8 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "mongodb": "^6.17.0",
-    "mongoose": "^8.0.0"
+    "mongoose": "^8.0.0",
+    "prettier": "^3.6.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

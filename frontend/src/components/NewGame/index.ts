@@ -1,0 +1,7 @@
+export { default as PageHeader } from './PageHeader'
+export { default as PlayerInput } from './PlayerInput'
+export { default as StatusMessage } from './StatusMessage'
+export { default as ActionButtons } from './ActionButtons'
+export { default as GameInstructions } from './GameInstructions'
+export { default as NewGameForm } from './NewGameForm'
+export { default } from './NewGameForm'

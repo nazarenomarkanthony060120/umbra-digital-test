@@ -16,7 +16,7 @@ export const connectDatabase = async (): Promise<void> => {
 };
 
 // Handle MongoDB connection events
-mongoose.connection.on('error', (error) => {
+mongoose.connection.on('error', error => {
   console.error('❌ MongoDB connection error:', error);
 });
 
@@ -34,4 +34,4 @@ process.on('SIGINT', async () => {
     console.error('❌ Error during MongoDB disconnection:', error);
     process.exit(1);
   }
-}); 
+});

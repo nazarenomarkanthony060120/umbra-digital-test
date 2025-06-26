@@ -20,7 +20,7 @@ const PlayerSchema = new Schema<IPlayer>({
   name: { type: String, required: true },
   wins: { type: Number, default: 0 },
   losses: { type: Number, default: 0 },
-  draws: { type: Number, default: 0 }
+  draws: { type: Number, default: 0 },
 });
 
 const GameSchema = new Schema<IGame>({
@@ -29,7 +29,7 @@ const GameSchema = new Schema<IGame>({
   totalRounds: { type: Number, default: 0 },
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
-  endedAt: { type: Date }
+  endedAt: { type: Date },
 });
 
-export const Game = mongoose.model<IGame>('Game', GameSchema); 
+export const Game = mongoose.model<IGame>('Game', GameSchema);

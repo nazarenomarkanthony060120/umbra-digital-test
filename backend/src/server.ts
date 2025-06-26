@@ -3,7 +3,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDatabase } from './config/database';
 import gameRoutes from './routes/games';
-import { errorHandler, handleUnhandledRejection, handleUncaughtException } from './middleware/errorHandler';
+import {
+  errorHandler,
+  handleUnhandledRejection,
+  handleUncaughtException,
+} from './middleware/errorHandler';
 import { requestLogger, errorLogger } from './middleware/logger';
 
 // Load environment variables
@@ -31,7 +35,7 @@ app.get('/health', (req, res) => {
     success: true,
     message: 'Server is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
   });
 });
 
@@ -43,8 +47,8 @@ app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
     error: {
-      message: `Route ${req.originalUrl} not found`
-    }
+      message: `Route ${req.originalUrl} not found`,
+    },
   });
 });
 
@@ -75,4 +79,4 @@ const startServer = async () => {
   }
 };
 
-startServer(); 
+startServer();

@@ -47,7 +47,7 @@ export const errorHandler = (
       method: req.method,
       body: req.body,
       params: req.params,
-      query: req.query
+      query: req.query,
     });
   }
 
@@ -58,9 +58,9 @@ export const errorHandler = (
       message,
       ...(process.env.NODE_ENV === 'development' && {
         stack: error.stack,
-        name: error.name
-      })
-    }
+        name: error.name,
+      }),
+    },
   });
 };
 
@@ -75,4 +75,4 @@ export const handleUnhandledRejection = (reason: any, promise: Promise<any>) => 
 export const handleUncaughtException = (error: Error) => {
   console.error('Uncaught Exception:', error);
   process.exit(1);
-}; 
+};
