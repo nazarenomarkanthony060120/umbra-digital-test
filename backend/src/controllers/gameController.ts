@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Game } from '../models/Game';
 import { gameService } from '../services/gameService';
-import { ApiError } from '../utils/ApiError';
 
 export const gameController = {
   // GET /api/games
